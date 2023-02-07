@@ -5,6 +5,7 @@
 #include "intro_creator.cpp"
 
 #define QUANTITY 100
+#define PARAMETERS_COUNT 5
 
 int main()
 {
@@ -13,7 +14,7 @@ int main()
     mat_points = get_mat_points("intro.txt");
     for (int row_index=0; row_index<QUANTITY; row_index++)
     {
-        for (int col_index=0; col_index<7; col_index++)
+        for (int col_index=0; col_index<PARAMETERS_COUNT; col_index++)
             printf("%d ", mat_points[row_index][col_index]);
         printf("\n");
     }

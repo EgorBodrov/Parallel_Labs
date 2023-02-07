@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define QUANTITY 100
+#define PARAMETERS_COUNT 5
 
 
 void create_document(int quantity, char * document_name)
@@ -21,10 +23,10 @@ void create_document(int quantity, char * document_name)
   for(int i=0; i<quantity; i++){
 
     // масса, x, y, z, vx, vy, vz
-    for (int j=0; j<7; j++)
+    for (int j=0; j<PARAMETERS_COUNT; j++)
     {
       int r=0;
-      if (j>=4)
+      if (j>2)
         r = rand() % 1000;
       else
         r = rand() % 10000;
@@ -76,7 +78,7 @@ int ** get_mat_points(char * document_name)
         }
         char * token = strtok(str, " ");
         int column = 0;
-        mat_points[row_index] = new int [7];
+        mat_points[row_index] = new int [PARAMETERS_COUNT];
         mat_points[row_index][column] = atoi(token);
         
         column++;

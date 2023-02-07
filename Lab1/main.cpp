@@ -1,23 +1,21 @@
 #include <stdio.h>
-#include <cstdlib>
-#include "Filemanager.h"
+#include <time.h>
+#include <stdlib.h>
+#include <string.h>
+#include "intro_creator.cpp"
 
-std::vector<std::vector<int>> v;
+#define QUANTITY 100
 
 int main()
 {
-	srand((unsigned)time(NULL));
-
-	v = get_random_data(10);
-
-	// Print input data
-	for (int i = 0; i < v.size(); i++)
-	{
-		for (int j = 0; j < v[i].size(); j++)
-			std::cout << v[i][j] << " ";
-
-		std::cout << "\n";
-	}
-
-	return 0;
+    create_document(QUANTITY, "intro.txt");
+    int ** mat_points = new int *;
+    mat_points = get_mat_points("intro.txt");
+    for (int row_index=0; row_index<QUANTITY; row_index++)
+    {
+        for (int col_index=0; col_index<7; col_index++)
+            printf("%d ", mat_points[row_index][col_index]);
+        printf("\n");
+    }
+    return 0;
 }

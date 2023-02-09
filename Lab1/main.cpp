@@ -1,7 +1,4 @@
-#include <stdio.h>
-#include <time.h>
-#include <stdlib.h>
-#include <string.h>
+#include <omp.h>
 #include <cmath>
 #include "document_worker.cpp"
 
@@ -10,20 +7,25 @@ MatPoint mat_points[QUANTITY];
 
 void getForces(MatPoint *mat_points)
 {
+
     for (int i = 0; i < QUANTITY; i++)
     {
-        for (int j = 0; j < QUANTITY; j++)
+        for (int j = i + 1; j < QUANTITY; j++)
         {
-            if (i == j)
-                continue;
+            // if (i == j)
+            //     continue;
 
             double x_dif = mat_points[j].x - mat_points[i].x;
             double y_dif = mat_points[j].y - mat_points[i].y;
-            double r = x_dif * x_dif + y_dif * y_dif;
+            double r = 1 / (x_dif * x_dif + y_dif * y_dif);
             double sqrt_r = sqrt(r);
-            double f = GRAVITY_CONSTANT * mat_points[i].mass * mat_points[j].mass / r;
-            mat_points[i].Fx = mat_points[i].Fx + f * x_dif * sqrt_r;
-            mat_points[i].Fy = mat_points[i].Fy + f * y_dif * sqrt_r;
+            double f = GRAVITY_CONSTANT * mat_points[i].mass * mat_points[j].mass * r;
+            double dfx = f * x_dif * sqrt_r;
+            double dfy = f * y_dif * sqrt_r;
+            mat_points[i].Fx = mat_points[i].Fx + dfx;
+            mat_points[i].Fy = mat_points[i].Fy + dfy;
+            mat_points[j].Fx = mat_points[j].Fx - dfx;
+            mat_points[j].Fy = mat_points[j].Fy - dfy;
         }
     }
 }
@@ -51,6 +53,8 @@ int main()
 
     create_document(QUANTITY, "intro.txt");
     get_mat_points(mat_points, "intro.txt");
+
+
     for (int row_index = 0; row_index < QUANTITY; row_index++)
     {
         mat_points[row_index].Fx = 0;

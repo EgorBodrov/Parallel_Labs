@@ -2,12 +2,15 @@
 #include <time.h>
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
 
 #define QUANTITY 1000
 #define PARAMETERS_COUNT 5
 #define dt 0.5
 #define GRAVITY_CONSTANT 0.000000000066743
 #define STEPS 10000
+
+#define PTRS 10
 
 struct MatPoint {
     double mass;
@@ -39,7 +42,8 @@ void create_document(int quantity, char * document_name)
     {
       double r=0;
       if (j>2){
-        r = rand() % 10;
+        int div = 50;
+        r = rand() % div - div/2;
       }
       else if (j<=2 and j>0){
         r = rand() % 20000;

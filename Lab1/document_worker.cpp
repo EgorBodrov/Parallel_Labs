@@ -10,7 +10,8 @@
 #define GRAVITY_CONSTANT 0.000000000066743
 #define STEPS 1000
 
-#define PTRS 10
+#define document_with_coordinates "coordinates.txt"
+#define THREAD_COUNT 4
 
 struct MatPoint {
     double mass;

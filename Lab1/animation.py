@@ -46,5 +46,5 @@ def update(coordinates_step):
     return ln,
 
 ani = FuncAnimation(fig, update, frames=all_coordinates,
-                    init_func=init, blit=True)
+                    init_func=init, interval=10, blit=True)
 plt.show()

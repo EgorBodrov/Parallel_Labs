@@ -8,7 +8,7 @@
 #define PARAMETERS_COUNT 5
 #define dt 0.5
 #define GRAVITY_CONSTANT 0.000000000066743
-#define STEPS 10000
+#define STEPS 1000
 
 #define PTRS 10
 
@@ -20,6 +20,7 @@ struct MatPoint {
     double vy;
     double Fx;
     double Fy;
+    pthread_mutex_t f_mutex;
 };
 
 void create_document(int quantity, char * document_name)
@@ -45,7 +46,7 @@ void create_document(int quantity, char * document_name)
         int div = 50;
         r = rand() % div - div/2;
       }
-      else if (j<=2 and j>0){
+      else if (j<=2 && j>0){
         r = rand() % 20000;
       }
       else{
@@ -128,6 +129,7 @@ MatPoint * get_mat_points(MatPoint * mat_points, char * document_name)
           }
             column++;
         }
+        pthread_mutex_init(&mat_points[row_index].f_mutex, NULL);
         // printf("%s", str);
     }
 

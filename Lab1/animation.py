@@ -29,8 +29,8 @@ xdata, ydata = [], []
 ln, = ax.plot([], [], 'ro')
 
 def init():
-    ax.set_xlim(-15000, 35000)
-    ax.set_ylim(-15000, 35000)
+    ax.set_xlim(-1000, 1000)
+    ax.set_ylim(-1000, 1000)
     return ln,
 
 def update(coordinates_step):

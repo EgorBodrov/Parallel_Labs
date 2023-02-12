@@ -19,7 +19,6 @@ void printProgress(int step) {
 
 void getForces(MatPoint *mat_points, int i, int j)
 {
-
     double x_dif = mat_points[j].x - mat_points[i].x;
     double y_dif = mat_points[j].y - mat_points[i].y;
     double r = 1 / (x_dif * x_dif + y_dif * y_dif);
@@ -45,6 +44,7 @@ void moveMatPoints(MatPoint *mat_points, int i)
     double dvx = mat_points[i].Fx / mat_points[i].mass * dt;
     double dvy = mat_points[i].Fy / mat_points[i].mass * dt;
 
+    
     mat_points[i].x = mat_points[i].x + (mat_points[i].vx + dvx / 2) * dt;
     mat_points[i].y = mat_points[i].y + (mat_points[i].vy + dvy / 2) * dt;
 

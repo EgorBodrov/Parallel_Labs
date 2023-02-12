@@ -4,14 +4,14 @@
 #include <string.h>
 #include <pthread.h>
 
-#define QUANTITY 1000
+#define QUANTITY 2
 #define PARAMETERS_COUNT 5
-#define dt 0.5
-#define GRAVITY_CONSTANT 0.000000000066743
-#define STEPS 1000
+#define dt 100
+#define GRAVITY_CONSTANT 0.000000000066743 // Умножена на 10000, т.к. сила получается весьма маленькой
+#define STEPS 25000
 
 #define document_with_coordinates "coordinates.txt"
-#define THREAD_COUNT 4
+#define THREAD_COUNT 24
 
 struct MatPoint {
     double mass;
@@ -39,16 +39,21 @@ void create_document(int quantity, char * document_name)
   fprintf(fp, "%d\n", QUANTITY); 
   for(int i=0; i<QUANTITY; i++){
 
-    // масса, x, y, z, vx, vy, vz
+    // масса, x, y, vx, vy
     for (int j=0; j<PARAMETERS_COUNT; j++)
     {
       double r=0;
       if (j>2){
-        int div = 50;
-        r = rand() % div - div/2;
+        int div = 0;
+        if (div > 0){
+          r = rand() % div - div/2;
+        }
       }
       else if (j<=2 && j>0){
-        r = rand() % 20000;
+        int div = 150;
+        if (div > 0){
+          r = (rand() % div - div/2) * 10;
+        }
       }
       else{
         r = rand()*10000;

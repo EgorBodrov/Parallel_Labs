@@ -57,53 +57,55 @@ void print_matrix(double* matrix, int rows, int cols)
     std::cout << std::endl;
 }
 
-void multiply_by_rows(int tasks, int rank)
+void calculate_scatter_counts(int* sendcounts, int* displs, int tasks, int num_per_process, int vector_length)
 {
-    // Calculate amount of rows for each process
-    int* sendcounts = (int*)malloc(tasks * sizeof(int));
-    int* displs = (int*)malloc(tasks * sizeof(int));
     int sum = 0;
-    int rem = F_ROWS % tasks;
+    int rem = num_per_process % tasks;
 
-    for (int i = 0; i < tasks; i++) 
+    for (int i = 0; i < tasks; i++)
     {
-        sendcounts[i] = F_ROWS / tasks;
-        if (rem > 0) 
+        sendcounts[i] = num_per_process / tasks;
+        if (rem > 0)
         {
             sendcounts[i]++;
             rem--;
         }
 
         displs[i] = sum;
-        sum += sendcounts[i] * F_COLUMNS;
+        sum += sendcounts[i] * vector_length;
     }
+
     for (int i = 0; i < tasks; i++)
-        sendcounts[i] *= F_COLUMNS;
+        sendcounts[i] *= vector_length;
+}
+
+void calculate_gather_counts(int* sendcounts, int* displs, int tasks, int result_length, int vector_length)
+{
+    int sum = 0;
+
+    for (int i = 0; i < tasks; i++) {
+        sendcounts[i] = sendcounts[i] / vector_length * result_length;
+        displs[i] = sum;
+        sum += sendcounts[i];
+    }
+}
+
+double* multiply_by_rows(double* f_matrix, double* s_matrix, int tasks, int rank)
+{
+    // Calculate amount of rows for each process
+    int* sendcounts = (int*)malloc(tasks * sizeof(int));
+    int* displs = (int*)malloc(tasks * sizeof(int));
+
+    calculate_scatter_counts(sendcounts, displs, tasks, F_ROWS, F_COLUMNS);
 
     int n_rows = sendcounts[rank] / F_COLUMNS;
-    double* f_matrix = NULL;
-    double* s_matrix = NULL;
     double* result = NULL;
     double* f_buffer = (double*)malloc(sendcounts[rank] * sizeof(double));
     double* local_result = (double*)malloc(n_rows * S_COLUMNS * sizeof(double));
 
     if (rank == 0)
-    {
-        f_matrix = get_matrix(F_ROWS, F_COLUMNS);
-        s_matrix = get_matrix(S_ROWS, S_COLUMNS);
-        //f_matrix = return_first();
-        //s_matrix = return_second();
         result = (double*)malloc(F_ROWS * S_COLUMNS * sizeof(double));
-        
-        std::cout << "First matrix (vector)" << std::endl;
-        print_matrix(f_matrix, F_ROWS, F_COLUMNS);
-        std::cout << "Second matrix (vector)" << std::endl;
-        print_matrix(s_matrix, S_ROWS, S_COLUMNS);
-    }
-    else 
-    {
-        s_matrix = (double*)malloc(S_ROWS * S_COLUMNS * sizeof(double));
-    }
+
     MPI_Barrier(MPI_COMM_WORLD);
 
     // Distribute by rows, Scatterv for cases when rows are undivisible by number of processes
@@ -120,42 +122,33 @@ void multiply_by_rows(int tasks, int rank)
         for (int j = 0; j < S_COLUMNS; j++)
         {
             for (int k = 0; k < F_COLUMNS; k++)
-            {
                 local_sum += f_buffer[i * F_COLUMNS + k] * s_matrix[k * S_COLUMNS + j];
-            }
-
+            
             local_result[i * S_COLUMNS + j] = local_sum;
             local_sum = 0;
         }
     }
 
-    // Calculations for Gatherv
-    sum = 0;
-    for (int i = 0; i < tasks; i++) {
-        sendcounts[i] = sendcounts[i] / F_COLUMNS * S_COLUMNS;
-        displs[i] = sum;
-        sum += sendcounts[i];
-    }
+    calculate_gather_counts(sendcounts, displs, tasks, S_COLUMNS, F_COLUMNS);
 
     MPI_Gatherv(local_result, n_rows * S_COLUMNS, MPI_DOUBLE, result, sendcounts, displs, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
     MPI_Barrier(MPI_COMM_WORLD);
 
-    if (rank == 0)
-    {
-        std::cout << "Result matrix (vector)" << std::endl;
-        print_matrix(result, F_ROWS, S_COLUMNS);
-    }
-
     if (f_matrix)
         free(f_matrix);
     if (s_matrix)
         free(s_matrix);
-    if (result)
-        free(result);
 
     free(f_buffer);
     free(sendcounts);
     free(displs);
     free(local_result);
+
+    return result;
+}
+
+void multiply_by_columns(int tasks, int rank)
+{
+
 }

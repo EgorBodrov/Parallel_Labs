@@ -17,12 +17,42 @@ int main(int* argc, char** argv)
     
     srand(time(NULL));
 
+    double* f_matrix = NULL;
+    double* s_matrix = NULL;
+    double* result = NULL;
+
+    if (rank == 0)
+    {
+        //f_matrix = get_matrix(F_ROWS, F_COLUMNS);
+        //s_matrix = get_matrix(S_ROWS, S_COLUMNS);
+        f_matrix = return_first();
+        s_matrix = return_second();
+
+        std::cout << "First matrix (vector)" << std::endl;
+        print_matrix(f_matrix, F_ROWS, F_COLUMNS);
+        std::cout << "Second matrix (vector)" << std::endl;
+        print_matrix(s_matrix, S_ROWS, S_COLUMNS);
+    }
+    else
+    {
+        s_matrix = (double*)malloc(S_ROWS * S_COLUMNS * sizeof(double));
+    }
+
     switch (METHOD)
     {
-    case 1: multiply_by_rows(tasks, rank); break;
+    case 1: result = multiply_by_rows(f_matrix, s_matrix, tasks, rank); break;
     case 2: break;
     case 3: break;
     }
+
+    if (rank == 0)
+    {
+        std::cout << "Result matrix (vector)" << std::endl;
+        print_matrix(result, F_ROWS, S_COLUMNS);
+    }
+
+    if (result)
+        free(result);
 
     MPI_Finalize();
 

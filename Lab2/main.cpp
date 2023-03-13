@@ -41,11 +41,12 @@ int main(int* argc, char** argv)
     switch (METHOD)
     {
     case 1: result = multiply_by_rows(f_matrix, s_matrix, tasks, rank); break;
-    case 2: break;
+    case 2: result = multiply_by_columns(f_matrix, s_matrix, tasks, rank); break;
     case 3: break;
+    default: break;
     }
 
-    if (rank == 0)
+    if (rank == 0 && result)
     {
         std::cout << "Result matrix (vector)" << std::endl;
         print_matrix(result, F_ROWS, S_COLUMNS);
